@@ -3,6 +3,7 @@ module github.com/gavv/webrtc-cli
 go 1.12
 
 require (
+	github.com/gen2brain/malgo v0.10.35
 	github.com/mattn/go-isatty v0.0.10
 	github.com/mesilliac/pulse-simple v0.0.0-20170506101341-75ac54e19fdf
 	github.com/pion/rtp v1.1.4
