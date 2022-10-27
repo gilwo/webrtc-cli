@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
+	"compress/zlib"
+	"encoding/base64"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/signal"
 	"strconv"
@@ -430,16 +434,55 @@ func readSDP() (string, error) {
 		fmt.Fprintln(os.Stderr, delim1)
 	}
 
-	sdp, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		return "", fmt.Errorf("can't read sdp from stdin: %s", err.Error())
+	reader := bufio.NewReader(os.Stdin)
+
+	sdp := []byte{}
+	for {
+		part, err := reader.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return "", fmt.Errorf("can't read sdp from stdin: %s", err.Error())
+		}
+		sdp = append(sdp, part...)
 	}
 
 	if tty {
 		fmt.Fprintln(os.Stderr, delim2)
 	}
 
+	if decoded, err := unBase64AndDeflate(string(sdp)); err == nil {
+		return decoded, nil
+	}
 	return string(sdp), nil
+}
+func compressAndBase64(sdp string) string {
+	var in bytes.Buffer
+	b := []byte(sdp)
+	w, err := zlib.NewWriterLevel(&in, zlib.BestCompression)
+	if err != nil {
+		panic(err)
+	}
+	w.Write(b)
+	w.Close()
+	return base64.StdEncoding.EncodeToString(in.Bytes())
+}
+func unBase64AndDeflate(raw string) (string, error) {
+	sd, err := base64.StdEncoding.DecodeString(raw)
+	if err != nil {
+		return "", err
+	}
+
+	in := bytes.NewBufferString(string(sd))
+
+	var out bytes.Buffer
+	r, err := zlib.NewReader(in)
+	if err != nil {
+		panic(err)
+	}
+	io.Copy(&out, r)
+	return out.String(), nil
 }
 
 func printSDP(sdp string) error {
@@ -448,6 +491,7 @@ func printSDP(sdp string) error {
 	var err error
 	if tty {
 		_, err = fmt.Fprint(os.Stdout, delim1+"\n"+sdp+"\n"+delim2+"\n")
+		_, err = fmt.Fprint(os.Stdout, delim1+"\n"+compressAndBase64(sdp)+"\n"+delim2+"\n")
 	} else {
 		_, err = fmt.Fprint(os.Stdout, sdp+"\n")
 		if err == nil {
