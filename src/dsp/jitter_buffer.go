@@ -143,7 +143,7 @@ func (j *JitterBuf) readFrame() ([]int16, error) {
 		bsize := j.bufferSize()
 
 		if bsize < j.targetSize {
-			return make([]int16, j.frameSize), nil
+			return make([]int16, 0), nil
 		}
 
 		if bsize > j.targetSize+j.frameSize {
