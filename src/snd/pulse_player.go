@@ -1,3 +1,5 @@
+//go:build pulse
+
 package snd
 
 import (
@@ -17,7 +19,11 @@ type PulsePlayer struct {
 	doneCh   chan struct{}
 }
 
-func NewPulsePlayer(params Params) (*PulsePlayer, error) {
+func init() {
+	NewPulsePlayer = newPulsePlayer
+}
+
+func newPulsePlayer(params Params) (Player, error) {
 	p := &PulsePlayer{
 		initCh:   make(chan error, 1),
 		dataCh:   make(chan []int16, 0),

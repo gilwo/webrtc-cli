@@ -1,3 +1,5 @@
+//go:build pulse
+
 package snd
 
 import (
@@ -14,7 +16,11 @@ type PulseRecorder struct {
 	doneCh   chan struct{}
 }
 
-func NewPulseRecorder(params Params) (*PulseRecorder, error) {
+func init() {
+	NewPulseRecorder = newPulseRecorder
+}
+
+func newPulseRecorder(params Params) (Reader, error) {
 	p := &PulseRecorder{
 		initCh:   make(chan error, 1),
 		batchCh:  make(chan Batch, 1),

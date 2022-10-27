@@ -1,6 +1,8 @@
 package snd
 
 import (
+	"errors"
+	"strings"
 	"time"
 )
 
@@ -25,5 +27,35 @@ func NewReader(params Params) (Reader, error) {
 	if isWavFile(params.DeviceOrFile) {
 		return NewWavReader(params)
 	}
-	return NewPulseRecorder(params)
+	if strings.Contains(params.DeviceOrFile, "malgo") && NewMalgoRecorder != nil {
+		return NewMalgoRecorder(params)
+	} else if NewPulseRecorder != nil {
+		return NewPulseRecorder(params)
+	} else {
+		return nil, errors.New("NewReader: missing implementation for" + params.DeviceOrFile)
+	}
 }
+
+type Player interface {
+	Batches() chan<- []int16
+	Errors() <-chan error
+	Stopped() <-chan struct{}
+	Stop()
+}
+
+func NewPlayer(params Params) (Player, error) {
+	if strings.Contains(params.DeviceOrFile, "malgo") {
+		return newMalgoPlayer(params)
+	} else if NewPulsePlayer != nil {
+		return NewPulsePlayer(params)
+	} else {
+		return nil, errors.New("NewPlayer: missing implementation for" + params.DeviceOrFile)
+	}
+}
+
+var (
+	NewPulseRecorder func(Params) (Reader, error)
+	NewMalgoRecorder func(Params) (Reader, error)
+	NewPulsePlayer   func(Params) (Player, error)
+	NewMalgoPlayer   func(Params) (Player, error)
+)

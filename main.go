@@ -302,7 +302,7 @@ func mainWithCode() int {
 	if *sink != "" {
 		printMsg("Starting playback...")
 
-		player, err := snd.NewPulsePlayer(snd.Params{
+		player, err := snd.NewPlayer(snd.Params{
 			DeviceOrFile: *sink,
 			Rate:         int(*rate),
 			Channels:     int(*channels),
