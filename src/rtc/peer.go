@@ -10,7 +10,7 @@ import (
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v2"
 	"github.com/pion/webrtc/v2/pkg/media"
-	"gopkg.in/gavv/opus.v2"
+	"gopkg.in/hraban/opus.v2"
 )
 
 type State string

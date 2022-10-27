@@ -13,5 +13,7 @@ require (
 	github.com/youpy/go-riff v0.0.0-20131220112943-557d78c11efb // indirect
 	github.com/youpy/go-wav v0.0.0-20160223082350-b63a9887d320
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	gopkg.in/gavv/opus.v2 v2.0.0-20191117073952-d4c14983ee1d
+	gopkg.in/hraban/opus.v2 v2.0.0-20220302220929-eeacdbcb92d0
 )
+
+replace gopkg.in/hraban/opus.v2 => github.com/gilwo/opus v0.0.0-20221027073344-2ead4004193d

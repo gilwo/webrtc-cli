@@ -6,7 +6,7 @@ import (
 
 	"github.com/pion/rtp"
 	"golang.org/x/time/rate"
-	"gopkg.in/gavv/opus.v2"
+	"gopkg.in/hraban/opus.v2"
 )
 
 type depacketizer struct {
@@ -22,7 +22,7 @@ type depacketizer struct {
 	rate     int
 	channels int
 
-	nFEC    int
+	nFEC int
 	nPLC int
 }
 
